@@ -14,36 +14,38 @@ class terminal_slot:
         self.slots = Reels(SETTINGS.symbols)
 
     def draw(self, current_reel):
+        screen_lines:list = list()
         reel_lines = self.slots.draw()
         # flash = math.floor(math.sin(time.process_time_ns()))
         flash = abs(math.sin(time.process_time_ns()))
         marquee = "SLOTS"
         if flash > 0.8:
             marquee = Fore.YELLOW + marquee + Fore.RESET
-        print(f"   ┏━━🞓 {marquee} 🞓━━━┓")
+        screen_lines.append(f"   ┏━━🞓 {marquee} 🞓━━━┓")
         for l in reel_lines:
-            print(f"   ┃ {l} ┃")
-        print("   ┗━━━━━━━━━━━━━━┛")
+            screen_lines.append(f"   ┃ {l} ┃")
+        screen_lines.append("   ┗━━━━━━━━━━━━━━┛")
         # Draw buttons
-        print("   ┏━━━━━━━━━━━━━━┓")
+        screen_lines.append("   ┏━━━━━━━━━━━━━━┓")
         button_pressed = f"{Fore.YELLOW}🔳{Fore.RESET}   "
         button = f"{Fore.YELLOW}🔲{Fore.RESET}   "
         button_row = "   ┃ " + button_pressed * \
             current_reel + button*(3-current_reel)
-        print(button_row.rstrip()+" ┃")
-        print("   ┗━━━━━━━━━━━━━━┛")
+        screen_lines.append(button_row.rstrip()+" ┃")
+        screen_lines.append("   ┗━━━━━━━━━━━━━━┛")
         # Draw prizes:
         half = len(SETTINGS.symbols)/2
         prize_line = "┃ "
-        print(f"┏{'━'*5}🞓 PRIZES 🞓{'━'*5}┓")
+        screen_lines.append(f"┏{'━'*5}🞓 PRIZES 🞓{'━'*5}┓")
         for idx, symbol in enumerate(self.slots.symbols, start=1):
             prize_line += f"{symbol}-{SETTINGS.prizes[symbol.prize_id]} "
             if half == idx:
-                print(f"{prize_line} ┃")
+                screen_lines.append(f"{prize_line} ┃")
                 prize_line = "┃ "
 
-        print(f"{prize_line}┃")
-        print(f"┗{'━'*20}┛")
+        screen_lines.append(f"{prize_line}┃")
+        screen_lines.append(f"┗{'━'*20}┛")
+        return screen_lines
 
     def update(self, current_reel: int = 0):
         self.slots.update(current_reel)

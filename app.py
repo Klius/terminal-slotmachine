@@ -4,7 +4,11 @@ import sys
 import tty
 import termios
 import fcntl
+from colorama import Fore
 from slots import terminal_slot
+from pyparsing import *
+
+
 key = ""
 
 # States
@@ -28,7 +32,7 @@ def main():
         key = input_read()
         update()
         draw()
-        time.sleep(0.03)
+        time.sleep(0.04)
 
 
 def input_read():
@@ -89,6 +93,17 @@ def update():
             STOP_REEL += 1
         slots.update(STOP_REEL)
 
+def length_ansi_string(string:str):
+    ESC = Literal('\x1b')
+    integer = Word(nums)
+    escapeSeq = Combine(ESC + '[' + Optional(delimitedList(integer,';')) + 
+                    oneOf(list(alphas)))
+
+    nonAnsiString = lambda s : Suppress(escapeSeq).transformString(s)
+
+    unColorString = nonAnsiString(string)
+    return len(unColorString)
+
 
 def clean():
     if os.name == 'nt':
@@ -96,19 +111,36 @@ def clean():
     else:
         os.system('clear')
 
+def end_msg_box(msg:str,padding:int=32):
+    pad = " "*(padding-length_ansi_string(msg))+"┃"
+    return msg+pad
+    
 
 def draw():
     # Clear previous frame and draw next
-    clean()
-    slots.draw(STOP_REEL)
+    print('\033[20A\033[2K', end='')
+    print(" ")
+    screen_lines:list = list()
+    screen_lines = slots.draw(STOP_REEL)
+    screen_lines.append("┏━🞓 STATUS 🞓"+"━"*20+"┓")
     if CHECKOUT:
-        print(f"You won!")
-        print(f"Cr. {slots.CREDITS} + {PRIZE} Cr.")
+        screen_lines.append(end_msg_box(f"┃ {Fore.BLUE}You won!!{Fore.RESET}"))
+        screen_lines.append(end_msg_box(f"┃ {Fore.YELLOW}🪙 {Fore.GREEN}{slots.CREDITS} + {PRIZE} {Fore.YELLOW}🪙{Fore.RESET}"))
     else:
-        print(f"Cr. {slots.CREDITS}")
+        if START_SPIN == False:
+            screen_lines.append(end_msg_box(f"┃ Press {Fore.BLUE}SPACE{Fore.RESET} to spin, {Fore.RED}X{Fore.RESET} to quit"))
+        if START_SPIN:
+            screen_lines.append(end_msg_box(f"┃ Press {Fore.BLUE}SPACE{Fore.RESET} to stop Reel"))
+        screen_lines.append(end_msg_box(f"┃ {Fore.YELLOW}🪙 {Fore.GREEN}{slots.CREDITS}{Fore.RESET}"))
+    screen_lines.append("┗"+"━"*31+"┛")
+    print("\n".join(screen_lines))
+    print('\033[4B', end='')
+    #Return cursor up https://stackoverflow.com/questions/34828142/cmd-console-game-reduction-of-blinking
+    #print('\033[20A\033[2K', end='')
 
 
 try:
+    clean()
     main()
 except (KeyboardInterrupt, SystemExit):
     os.system('stty sane')

@@ -134,9 +134,8 @@ def draw():
         screen_lines.append(end_msg_box(f"┃ {Fore.YELLOW}🪙 {Fore.GREEN}{slots.CREDITS}{Fore.RESET}"))
     screen_lines.append("┗"+"━"*31+"┛")
     print("\n".join(screen_lines))
-    print('\033[4B', end='')
     #Return cursor up https://stackoverflow.com/questions/34828142/cmd-console-game-reduction-of-blinking
-    #print('\033[20A\033[2K', end='')
+    print('\033[4B', end='')
 
 
 try:

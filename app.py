@@ -94,4 +94,8 @@ def draw():
     clean()
     slots.draw()
 
-main()
+try:
+    main()
+except (KeyboardInterrupt, SystemExit):
+    os.system('stty sane')
+    print('stopping.')

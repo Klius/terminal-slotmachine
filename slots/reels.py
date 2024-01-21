@@ -21,7 +21,7 @@ class Reels:
             line.append(self.symbols[random.randint(0, len(self.symbols)-1)])
         return line
 
-    def update(self,start:int = 0):
+    def update(self, start: int = 0):
         """Updates the reels with fresh symbols
 
         Args:
@@ -29,12 +29,12 @@ class Reels:
         """
         if start > len(self.lines):
             return
-        for idx,line in enumerate(self.lines):
+        for idx, line in enumerate(self.lines):
             if start > idx:
                 continue
             line.pop()
         new_line = self.generate_line()
-        for idx,symbol in enumerate(new_line):
+        for idx, symbol in enumerate(new_line):
             if start > idx:
                 continue
             self.lines[idx].insert(0, symbol)
@@ -42,5 +42,6 @@ class Reels:
     def draw(self):
         scan_lines = list()
         for i in range(len(self.lines)):
-            scan_lines.append(f"{self.lines[0][i]} | {self.lines[1][i]} | {self.lines[2][i]}")
+            scan_lines.append(
+                f"{self.lines[0][i]} ┃ {self.lines[1][i]} ┃ {self.lines[2][i]}")
         return scan_lines

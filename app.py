@@ -135,12 +135,14 @@ def draw():
     screen_lines.append("┗"+"━"*31+"┛")
     print("\n".join(screen_lines))
     #Return cursor up https://stackoverflow.com/questions/34828142/cmd-console-game-reduction-of-blinking
-    print('\033[4B', end='')
+    print("\033[1;1H",end="")
 
 
 try:
     clean()
     main()
+    clean()
+    print("Thanks for playing!")
 except (KeyboardInterrupt, SystemExit):
     os.system('stty sane')
-    print('stopping.')
+    clean()
